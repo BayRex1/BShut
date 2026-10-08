@@ -1,0 +1,5 @@
+Military Jeep by Zsky (Low Poly Military Vehicles), via Poly Pizza.
+Source: https://poly.pizza/m/AcSdGGrgYP
+License: CC-BY 3.0. Keep attribution when the asset is included in BGame.
+GitHub mirror: https://github.com/VitorHolandaI/box_godot/tree/9279b253b0d172f973cacf16fa1f7e3a6e393d57/assets/models/jeep_military
+Expected file: jeep.glb
