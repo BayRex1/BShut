@@ -23,7 +23,7 @@ class GameRenderer(context: Context) {
     fun start() { state = State.LOADING; onMenuVisibilityChanged?.invoke(false); renderer.restart() }
 
     inner class SceneRenderer : GLSurfaceView.Renderer {
-        private val scene = World()
+        private val scene = World(context)
         private var lastNs = 0L
         fun restart() { gameTime = 0f; state = State.LOADING }
 
@@ -56,12 +56,14 @@ class GameRenderer(context: Context) {
         }
     }
 
-    class World {
+    class World(private val context: Context) {
         private lateinit var cube: Mesh
         private lateinit var rounded: Mesh
         private lateinit var cylinder: Mesh
         private lateinit var capsule: Mesh
         private lateinit var shader: Shader
+        private lateinit var treeGlb: StaticGlbModel
+        private lateinit var terroristGlb: StaticGlbModel
         private val proj = FloatArray(16)
         private val view = FloatArray(16)
         private val model = FloatArray(16)
@@ -76,6 +78,10 @@ class GameRenderer(context: Context) {
             rounded = Mesh.sphere(20, 14)
             cylinder = Mesh.cylinder(24)
             capsule = Mesh.capsule(16, 8)
+            // Real RigModels assets: textured tree + Zone 9 enemy.
+            // The tree source has a baked 0.01 root scale and a -90° X orientation.
+            treeGlb = StaticGlbModel(context.assets, "models/tree.glb", scale = 0.01f)
+            terroristGlb = StaticGlbModel(context.assets, "models/zone9_terrorist.glb", scale = 1f, onlyMeshes = setOf(0))
         }
 
         fun resize(w: Int, h: Int) {
@@ -138,8 +144,12 @@ class GameRenderer(context: Context) {
             ground(0f, .015f, -29f, 3.5f, .07f, 60f, .16f, .145f, .115f)
             for (i in -6..6) {
                 val z = -3.5f - i * 6.8f
-                tree(i * 2.65f + sin(i.toFloat()) * .5f, -.55f, z, .82f + abs(sin(i.toFloat())) * .32f)
-                tree(i * 2.85f + .8f, 2.0f, z - 3.0f, .72f + abs(cos(i.toFloat())) * .35f)
+                realTree(i * 2.65f + sin(i.toFloat()) * .5f, -.55f, z, .82f + abs(sin(i.toFloat())) * .32f)
+                realTree(i * 2.85f + .8f, -.25f, z - 3.0f, .72f + abs(cos(i.toFloat())) * .35f)
+            }
+            // A real textured Zone 9 model is placed ahead of the jeep as a world prop.
+            if (t > 9f) {
+                terroristGlb.draw(vp, 2.9f, 0f, -25f, yaw = 180f, instanceScale = 1.05f)
             }
             for (i in 0..18) {
                 val x = sin(i * 7.13f) * 4.6f
@@ -147,6 +157,12 @@ class GameRenderer(context: Context) {
                 rock(x, .02f, z, .18f + (i % 3) * .09f, .12f, .25f + (i % 2) * .12f)
                 grassTuft(x + .3f, .04f, z - .25f)
             }
+        }
+
+        private fun realTree(x: Float, y: Float, z: Float, scale: Float) {
+            // The original tree is about 1.9m tall after its baked 0.01 root scale.
+            // 2.6x gives a believable forest tree without filling the camera.
+            treeGlb.draw(vp, x, y, z, yaw = (x * 17f) % 360f, pitch = -90f, instanceScale = scale * 2.6f)
         }
 
         private fun tree(x: Float, y: Float, z: Float, scale: Float) {
