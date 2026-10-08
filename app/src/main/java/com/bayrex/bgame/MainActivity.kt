@@ -18,8 +18,8 @@ class MainActivity : Activity() {
 
         game = GameRenderer(this)
         filamentMenu = FilamentMenu(this)
-        // Keep the procedural hero visible until the external GLB viewer is ready.
-        filamentMenu.surfaceView.visibility = View.GONE
+        // Filament menu is the top layer; it shows the uploaded girl.glb.
+        filamentMenu.surfaceView.visibility = View.VISIBLE
         hud = HudView(this, game)
 
         val root = FrameLayout(this)
