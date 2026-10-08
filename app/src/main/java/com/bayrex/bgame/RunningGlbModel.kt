@@ -206,7 +206,7 @@ class RunningGlbModel(
             val count = accessors.getJSONObject(ibAcc).getInt("count")
             for (i in 0 until count) {
                 val m = FloatArray(16)
-                for (k in 0 until 16) m[k] = number(ibAcc, i, k)
+                for (k in 0 until 16) m[k] = readNumber(ibAcc, i, k)
                 inverseBind.add(m)
             }
         }
@@ -254,11 +254,11 @@ class RunningGlbModel(
                 val count = if (ia >= 0) accessors.getJSONObject(ia).getInt("count") else pc
                 val verts = Array(count) {
                     val src = if (ia >= 0) indexValue(ia, it) else it
-                    val pp = FloatArray(3) { k -> number(pos, src, k) }
-                    val nn = FloatArray(3) { k -> if (nor >= 0) number(nor, src, k) else if (k == 1) 1f else 0f }
-                    val uu = FloatArray(2) { k -> if (uv >= 0) number(uv, src, k) else 0f }
-                    val jj = IntArray(4) { k -> number(ji, src, k).toInt() }
-                    val ww = FloatArray(4) { k -> number(wi, src, k) }
+                    val pp = FloatArray(3) { k -> readNumber(pos, src, k) }
+                    val nn = FloatArray(3) { k -> if (nor >= 0) readNumber(nor, src, k) else if (k == 1) 1f else 0f }
+                    val uu = FloatArray(2) { k -> if (uv >= 0) readNumber(uv, src, k) else 0f }
+                    val jj = IntArray(4) { k -> readNumber(ji, src, k).toInt() }
+                    val ww = FloatArray(4) { k -> readNumber(wi, src, k) }
                     Vertex(pp, nn, uu, jj, ww)
                 }
                 var tex = 0
@@ -392,6 +392,20 @@ class RunningGlbModel(
         }
     }
 
+    private fun readNumber(accessor: Int, element: Int, component: Int): Float {
+        val a = accessors.getJSONObject(accessor)
+        val vi = a.optInt("bufferView", -1)
+        val v = if (vi >= 0) views.getJSONObject(vi) else JSONObject()
+        val n = when (a.getString("type")) { "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4; "MAT4" -> 16; else -> 1 }
+        val ct = a.getInt("componentType")
+        val cs = when (ct) { 5120,5121 -> 1; 5122,5123 -> 2; 5125,5126 -> 4; else -> 4 }
+        val base = v.optInt("byteOffset",0) + a.optInt("byteOffset",0)
+        val stride = if (v.optInt("byteStride",0)>0) v.optInt("byteStride",0) else n*cs
+        val p = base + element*stride + component*cs
+        val bb = ByteBuffer.wrap(bin).order(ByteOrder.LITTLE_ENDIAN)
+        return when(ct){5126->bb.getFloat(p);5125->bb.getInt(p).toLong().and(0xffffffffL).toFloat();5123->bb.getShort(p).toInt().and(0xffff).toFloat();5122->bb.getShort(p).toFloat();5121->bb.get(p).toInt().and(0xff).toFloat();5120->bb.get(p).toFloat();else->0f}
+    }
+
     private fun animate(time: Float) {
         for (i in nodes.indices) {
             animatedT[i][0]=nodes[i].t[0]; animatedT[i][1]=nodes[i].t[1]; animatedT[i][2]=nodes[i].t[2]
@@ -411,7 +425,7 @@ class RunningGlbModel(
             if(t<=first) hi=0 else if(t>=last) lo=count-1 else {
                 while(hi-lo>1){ val mid=(lo+hi)/2; if(readNumber(s.input,mid,0)<=t) lo=mid else hi=mid }
             }
-            val ta=number(s.input,lo,0); val tb=number(s.input,hi,0)
+            val ta=readNumber(s.input,lo,0); val tb=readNumber(s.input,hi,0)
             val f=if(hi==lo)0f else ((t-ta)/(tb-ta)).coerceIn(0f,1f)
             val outAcc=accessors.getJSONObject(s.output)
             val comps=when(outAcc.getString("type")){"VEC4"->4;"VEC3"->3;else->1}
