@@ -23,7 +23,7 @@ class FilamentMenu(context: Context) {
     companion object {
         init { Utils.init() }
         private const val MODEL_URL =
-            "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb"
+            "https://cdn.cinevva.com/assets/packs/quaternius/toon-shooter-kit/Character_Soldier.glb?download=1"
     }
 
     private val frameCallback = object : Choreographer.FrameCallback {
