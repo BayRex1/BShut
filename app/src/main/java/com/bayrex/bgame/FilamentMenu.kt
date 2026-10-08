@@ -12,7 +12,7 @@ import java.io.BufferedInputStream
 import java.net.URL
 import java.nio.ByteBuffer
 
-class FilamentMenu(context: Context) {
+class FilamentMenu(private val context: Context) {
     val surfaceView = SurfaceView(context)
     private val choreographer = Choreographer.getInstance()
     private lateinit var viewer: ModelViewer
@@ -22,8 +22,7 @@ class FilamentMenu(context: Context) {
 
     companion object {
         init { Utils.init() }
-        private const val MODEL_URL =
-            "https://cdn.cinevva.com/assets/packs/quaternius/toon-shooter-kit/Character_Soldier.glb?download=1"
+        private const val MODEL_ASSET = "models/girl.glb"
     }
 
     private val frameCallback = object : Choreographer.FrameCallback {
@@ -80,9 +79,7 @@ class FilamentMenu(context: Context) {
     private fun loadModel() {
         loaderThread = Thread {
             try {
-                val bytes = BufferedInputStream(URL(MODEL_URL).openStream()).use { input ->
-                    input.readBytes()
-                }
+                val bytes = context.assets.open(MODEL_ASSET).use { input -> input.readBytes() }
                 val buffer = ByteBuffer.allocateDirect(bytes.size)
                 buffer.put(bytes).flip()
                 surfaceView.post {
@@ -108,7 +105,7 @@ class FilamentMenu(context: Context) {
                 // The game remains playable with the procedural fallback scene.
             }
         }.also {
-            it.name = "BGame-GLB-Loader"
+            it.name = "BGame-Local-GLB-Loader"
             it.start()
         }
     }
