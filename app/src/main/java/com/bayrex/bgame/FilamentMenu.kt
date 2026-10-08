@@ -18,16 +18,24 @@ class FilamentMenu(context: Context) {
     private lateinit var viewer: ModelViewer
     private var started = false
     private var loaderThread: Thread? = null
+    private var animationStartNs = 0L
 
     companion object {
         init { Utils.init() }
         private const val MODEL_URL =
-            "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/FlightHelmet/glTF-Binary/FlightHelmet.glb"
+            "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb"
     }
 
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!started) return
+            viewer.animator?.apply {
+                if (animationCount > 0) {
+                    val elapsed = (frameTimeNanos - animationStartNs) / 1_000_000_000.0f
+                    applyAnimation(0, elapsed)
+                    updateBoneMatrices()
+                }
+            }
             viewer.render(frameTimeNanos)
             choreographer.postFrameCallback(this)
         }
@@ -36,6 +44,7 @@ class FilamentMenu(context: Context) {
     fun start() {
         if (started) return
         started = true
+        animationStartNs = System.nanoTime()
         viewer = ModelViewer(surfaceView)
 
         surfaceView.setBackgroundColor(Color.rgb(10, 14, 12))
