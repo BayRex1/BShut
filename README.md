@@ -19,8 +19,9 @@ GitHub Actions builds a debug APK on every push to `main`. The APK is published 
 - Black-screen aftermath and return to the main menu
 
 ## 3D asset credits
-- **Soldier.glb** — Tomás Laulhé, modified by Don McCurdy, from the three.js examples.
+- **Character_Soldier.glb** — Quaternius Toon Shooter Kit, delivered as a single GLB through Cinevva's CC0 asset library.
 - License: **CC0 1.0**.
-- Source: https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/Soldier.glb
+- Source: https://app.cinevva.com/game-assets/free-3d-character-models
+- The model has 21,469 vertices and 17 animation clips according to the asset listing.
 
 The procedural gameplay geometry remains original/generated. External 3D assets are only added when their license permits redistribution.
