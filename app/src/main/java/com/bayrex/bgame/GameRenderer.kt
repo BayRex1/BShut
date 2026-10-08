@@ -7,11 +7,12 @@ import android.opengl.Matrix
 import kotlin.math.*
 
 class GameRenderer(context: Context) {
+    private val appContext = context
     enum class State { MENU, LOADING, DRIVE, CRASH }
     @Volatile var state = State.MENU
     @Volatile var gameTime = 0f
     var onMenuVisibilityChanged: ((Boolean) -> Unit)? = null
-    val glView = GLSurfaceView(context)
+    val glView = GLSurfaceView(appContext)
     private val renderer = SceneRenderer()
 
     init {
@@ -23,7 +24,7 @@ class GameRenderer(context: Context) {
     fun start() { state = State.LOADING; onMenuVisibilityChanged?.invoke(false); renderer.restart() }
 
     inner class SceneRenderer : GLSurfaceView.Renderer {
-        private val scene = World(context)
+        private val scene = World(appContext)
         private var lastNs = 0L
         fun restart() { gameTime = 0f; state = State.LOADING }
 
