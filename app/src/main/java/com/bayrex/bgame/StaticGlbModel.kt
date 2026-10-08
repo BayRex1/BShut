@@ -251,6 +251,8 @@ class StaticGlbModel(
         Matrix.setIdentityM(mdl, 0)
         Matrix.translateM(mdl, 0, x, y, z)
         Matrix.rotateM(mdl, 0, yaw, 0f, 1f, 0f)
+        Matrix.rotateM(mdl, 0, pitch, 1f, 0f, 0f)
+        Matrix.rotateM(mdl, 0, roll, 0f, 0f, 1f)
         Matrix.scaleM(mdl, 0, instanceScale, instanceScale, instanceScale)
         Matrix.multiplyMM(mvp, 0, vp, 0, mdl, 0)
         GLES20.glUseProgram(program)
