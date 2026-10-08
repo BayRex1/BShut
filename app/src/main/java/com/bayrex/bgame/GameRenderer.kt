@@ -75,11 +75,11 @@ class GameRenderer(context: Context) {
         private fun drawSoldier(t:Float){
             val bob=sin(t*1.7f)*.025f; val aim=sin(t*.65f)*.35f
             // boots / legs / torso / head
-            box(-.28f,.38f+bob,0,.20f,.75f,.24f,.07f,.08f,.08f); box(.28f,.38f+bob,0,.20f,.75f,.24f,.07f,.08f,.08f)
-            box(0f,1.18f+bob,0,.68f,.82f,.38f,.10f,.16f,.22f)
-            sphere(0f,1.82f+bob,0,.29f,.34f,.29f,.48f,.34f,.24f)
+            box(-.28f,.38f+bob,0f,.20f,.75f,.24f,.07f,.08f,.08f); box(.28f,.38f+bob,0f,.20f,.75f,.24f,.07f,.08f,.08f)
+            box(0f,1.18f+bob,0f,.68f,.82f,.38f,.10f,.16f,.22f)
+            sphere(0f,1.82f+bob,0f,.29f,.34f,.29f,.48f,.34f,.24f)
             // helmet
-            sphere(0f,2.02f+bob,0,.34f,.18f,.34f,.08f,.10f,.11f)
+            sphere(0f,2.02f+bob,0f,.34f,.18f,.34f,.08f,.10f,.11f)
             box(-.52f,1.28f+bob,aim*.12f,.16f,.72f,.16f,.10f,.15f,.20f)
             box(.52f,1.28f+bob,-aim*.12f,.16f,.72f,.16f,.10f,.15f,.20f)
             // rifle
@@ -90,7 +90,7 @@ class GameRenderer(context: Context) {
             val z=-5f-t*.32f
             box(0f,.62f,z,2.15f,.52f,3.2f,.08f,.12f,.12f)
             box(0f,1.08f,z+.35f,1.8f,.62f,1.55f,.05f,.08f,.06f)
-            for(x in listOf(-1.05f,1.05f)) for(zz in listOf(z-1.0f,z+1.0f)) cyl(x,.35f,zz,.42f,.22f,0f,0f,90f,.025f,.025f,.025f)
+            for(x in listOf(-1.05f,1.05f)) for(zz in listOf(z-1.0f,z+1.0f)) cyl(x,.35f,zz,.42f,.22f,.42f,0f,0f,90f,.025f,.025f,.025f)
             box(0f,1.1f,z+.33f,1.55f,.48f,.08f,.20f,.28f,.32f)
         }
         private fun drawDriver(t:Float){
