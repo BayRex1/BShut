@@ -8,8 +8,6 @@ import com.google.android.filament.EntityManager
 import com.google.android.filament.LightManager
 import com.google.android.filament.utils.ModelViewer
 import com.google.android.filament.utils.Utils
-import java.io.BufferedInputStream
-import java.net.URL
 import java.nio.ByteBuffer
 
 class FilamentMenu(private val context: Context) {
@@ -84,9 +82,7 @@ class FilamentMenu(private val context: Context) {
                 buffer.put(bytes).flip()
                 surfaceView.post {
                     if (!started) return@post
-                    viewer.loadModelGltfAsync(buffer) { _ ->
-                        ByteBuffer.allocateDirect(0)
-                    }
+                    viewer.loadModelGlb(buffer)
                     viewer.transformToUnitCube()
                     viewer.view.dynamicResolutionOptions =
                         viewer.view.dynamicResolutionOptions.apply {
