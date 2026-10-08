@@ -148,8 +148,13 @@ class GameRenderer(context: Context) {
             ground(0f, .015f, -29f, 3.5f, .07f, 60f, .16f, .145f, .115f)
             for (i in -6..6) {
                 val z = -3.5f - i * 6.8f
-                realTree(i * 2.65f + sin(i.toFloat()) * .5f, -.55f, z, .82f + abs(sin(i.toFloat())) * .32f)
-                realTree(i * 2.85f + .8f, -.25f, z - 3.0f, .72f + abs(cos(i.toFloat())) * .35f)
+                val side = if (i % 2 == 0) -1f else 1f
+                // Keep every trunk outside the drivable corridor so the first-person
+                // camera can never end up inside a tree.
+                val x1 = side * (3.9f + abs(sin(i.toFloat())) * 1.6f)
+                val x2 = -side * (4.4f + abs(cos(i.toFloat())) * 1.4f)
+                realTree(x1, -.55f, z, .82f + abs(sin(i.toFloat())) * .32f)
+                realTree(x2, -.25f, z - 3.0f, .72f + abs(cos(i.toFloat())) * .35f)
             }
             // A real textured Zone 9 model is placed ahead of the jeep as a world prop.
             if (t > 9f) {
