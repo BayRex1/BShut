@@ -64,6 +64,7 @@ class GameRenderer(context: Context) {
         private lateinit var shader: Shader
         private lateinit var treeGlb: StaticGlbModel
         private lateinit var terroristGlb: StaticGlbModel
+        private var jeepGlb: StaticGlbModel? = null
         private val proj = FloatArray(16)
         private val view = FloatArray(16)
         private val model = FloatArray(16)
@@ -82,6 +83,9 @@ class GameRenderer(context: Context) {
             // The tree source has a baked 0.01 root scale and a -90° X orientation.
             treeGlb = StaticGlbModel(context.assets, "models/tree.glb", scale = 0.01f)
             terroristGlb = StaticGlbModel(context.assets, "models/zone9_terrorist.glb", scale = 1f, onlyMeshes = setOf(0))
+            // Optional real military jeep: drop jeep.glb beside the other assets.
+            // Until then the detailed procedural jeep remains the safe fallback.
+            jeepGlb = try { StaticGlbModel(context.assets, "models/jeep.glb", scale = 1f) } catch (_: Exception) { null }
         }
 
         fun resize(w: Int, h: Int) {
@@ -232,6 +236,12 @@ class GameRenderer(context: Context) {
 
         private fun drawJeep(t: Float) {
             val z = -5.4f - t * .31f
+            jeepGlb?.let {
+                // Military Jeep source uses a 1.3 visual scale and faces +Z,
+                // so rotate it 180° to match BGame's -Z driving direction.
+                it.draw(vp, 0f, .99f, z, yaw = 180f, instanceScale = 1.3f)
+                return
+            }
             shadow(0f, .05f, z, 1.35f, .48f)
             // chassis / fenders / hood
             box(0f, .64f, z, 2.05f, .40f, 3.05f, .055f, .07f, .065f)
