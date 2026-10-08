@@ -7,7 +7,10 @@ import kotlin.math.min
 
 class HudView(context: android.content.Context, private val game: GameRenderer) : View(context) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var pulse = 0f\n    private var lastX = 0f\n    private var lastY = 0f\n    private var lastPinch = 0f
+    private var pulse = 0f
+    private var lastX = 0f
+    private var lastY = 0f
+    private var lastPinch = 0f
 
     init { setLayerType(View.LAYER_TYPE_SOFTWARE, null) }
 
