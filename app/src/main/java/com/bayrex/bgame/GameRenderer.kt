@@ -10,6 +10,7 @@ class GameRenderer(context: Context) {
     enum class State { MENU, LOADING, DRIVE, CRASH }
     @Volatile var state = State.MENU
     @Volatile var gameTime = 0f
+    var onMenuVisibilityChanged: ((Boolean) -> Unit)? = null
     val glView = GLSurfaceView(context)
     private val renderer = SceneRenderer()
 
@@ -19,7 +20,7 @@ class GameRenderer(context: Context) {
         glView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
     }
 
-    fun start() { state = State.LOADING; renderer.restart() }
+    fun start() { state = State.LOADING; onMenuVisibilityChanged?.invoke(false); renderer.restart() }
 
     inner class SceneRenderer : GLSurfaceView.Renderer {
         private val scene = World()
@@ -47,7 +48,7 @@ class GameRenderer(context: Context) {
             when (state) {
                 State.LOADING -> { gameTime += dt; if (gameTime > 2.5f) { state = State.DRIVE; gameTime = 0f } }
                 State.DRIVE -> { gameTime += dt; if (gameTime > 34f) { state = State.CRASH; gameTime = 0f } }
-                State.CRASH -> { gameTime += dt; if (gameTime > 9f) { state = State.MENU; gameTime = 0f } }
+                State.CRASH -> { gameTime += dt; if (gameTime > 9f) { state = State.MENU; gameTime = 0f; onMenuVisibilityChanged?.invoke(true) } }
                 State.MENU -> {}
             }
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
