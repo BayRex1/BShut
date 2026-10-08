@@ -245,7 +245,7 @@ class StaticGlbModel(
         }
     }
 
-    fun draw(vp: FloatArray, x: Float, y: Float, z: Float, yaw: Float = 0f, instanceScale: Float = 1f) {
+    fun draw(vp: FloatArray, x: Float, y: Float, z: Float, yaw: Float = 0f, pitch: Float = 0f, roll: Float = 0f, instanceScale: Float = 1f) {
         val mdl = FloatArray(16)
         val mvp = FloatArray(16)
         Matrix.setIdentityM(mdl, 0)
