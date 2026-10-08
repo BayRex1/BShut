@@ -122,7 +122,7 @@ class RunningGlbModel(
             val v = if (vi >= 0) views.getJSONObject(vi) else JSONObject()
             return Triple(a, v.optInt("byteOffset", 0) + a.optInt("byteOffset", 0), v.optInt("byteStride", 0))
         }
-        fun number(accessor: Int, element: Int, component: Int): Float {
+        fun readNumber(accessor: Int, element: Int, component: Int): Float {
             val a = accessors.getJSONObject(accessor)
             val vi = a.optInt("bufferView", -1)
             val v = if (vi >= 0) views.getJSONObject(vi) else JSONObject()
@@ -232,7 +232,7 @@ class RunningGlbModel(
             for (i in samplers.indices) {
                 val s = samplers[i]
                 val a = accessors.getJSONObject(s.input)
-                animationDuration = max(animationDuration, a.optJSONArray("max")?.optDouble(0, animationDuration)?.toFloat() ?: animationDuration)
+                animationDuration = max(animationDuration, a.optJSONArray("max")?.optDouble(0, animationDuration.toDouble())?.toFloat() ?: animationDuration)
             }
         }
 
@@ -376,7 +376,7 @@ class RunningGlbModel(
                 data[o][3]=sn[0]/nl; data[o][4]=sn[1]/nl; data[o][5]=sn[2]/nl
                 data[o][6]=v.uv[0]; data[o][7]=v.uv[1]
             }
-            fb.put(data, outIndex - part.vertices.size, part.vertices.size).position(0)
+            for (i in 0 until part.vertices.size) { val row = data[outIndex - part.vertices.size + i]; fb.put(row) }; fb.position(0)
             GLES20.glEnableVertexAttribArray(aPos)
             GLES20.glVertexAttribPointer(aPos,3,GLES20.GL_FLOAT,false,32,fb)
             fb.position(3); GLES20.glEnableVertexAttribArray(aNormal)
@@ -405,18 +405,18 @@ class RunningGlbModel(
             val a=accessors.getJSONObject(s.input)
             val count=a.getInt("count")
             if(count<=0) continue
-            val first=number(s.input,0,0)
-            val last=number(s.input,count-1,0)
+            val first=readNumber(s.input,0,0)
+            val last=readNumber(s.input,count-1,0)
             var lo=0; var hi=count-1
             if(t<=first) hi=0 else if(t>=last) lo=count-1 else {
-                while(hi-lo>1){ val mid=(lo+hi)/2; if(number(s.input,mid,0)<=t) lo=mid else hi=mid }
+                while(hi-lo>1){ val mid=(lo+hi)/2; if(readNumber(s.input,mid,0)<=t) lo=mid else hi=mid }
             }
             val ta=number(s.input,lo,0); val tb=number(s.input,hi,0)
             val f=if(hi==lo)0f else ((t-ta)/(tb-ta)).coerceIn(0f,1f)
             val outAcc=accessors.getJSONObject(s.output)
             val comps=when(outAcc.getString("type")){"VEC4"->4;"VEC3"->3;else->1}
-            val vals=FloatArray(comps){k->number(s.output,lo,k)}
-            val vals2=FloatArray(comps){k->number(s.output,hi,k)}
+            val vals=FloatArray(comps){k->readNumber(s.output,lo,k)}
+            val vals2=FloatArray(comps){k->readNumber(s.output,hi,k)}
             val result=FloatArray(comps){k->vals[k]+(vals2[k]-vals[k])*f}
             when(c.path){
                 "translation" -> for(k in 0..2) animatedT[c.node][k]=result[k]
