@@ -11,8 +11,8 @@ android {
         applicationId = "com.bayrex.bgame"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0-glb"
     }
 
     buildTypes {
@@ -24,6 +24,16 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
+
+    packaging {
+        resources.excludes += "META-INF/*"
+    }
+}
+
+dependencies {
+    implementation("com.google.android.filament:filament-android:1.9.3")
+    implementation("com.google.android.filament:gltfio-android:1.9.3")
+    implementation("com.google.android.filament:filament-utils-android:1.9.3")
 }
 
 kotlin {
