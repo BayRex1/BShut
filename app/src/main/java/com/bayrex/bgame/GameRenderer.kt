@@ -13,7 +13,10 @@ class GameRenderer(context: Context) {
     @Volatile var gameTime = 0f
     var onMenuVisibilityChanged: ((Boolean) -> Unit)? = null
     val glView = GLSurfaceView(appContext)
-    private val renderer = SceneRenderer()\n\n    fun orbitCamera(dx: Float, dy: Float) = renderer.orbitCamera(dx, dy)\n    fun zoomCamera(delta: Float) = renderer.zoomCamera(delta)
+    private val renderer = SceneRenderer()
+
+    fun orbitCamera(dx: Float, dy: Float) = renderer.orbitCamera(dx, dy)
+    fun zoomCamera(delta: Float) = renderer.zoomCamera(delta)
 
     init {
         glView.setEGLContextClientVersion(2)
@@ -26,7 +29,9 @@ class GameRenderer(context: Context) {
     inner class SceneRenderer : GLSurfaceView.Renderer {
         private val scene = World(appContext)
         private var lastNs = 0L
-        fun restart() { gameTime = 0f; state = State.LOADING }\n        fun orbitCamera(dx: Float, dy: Float) { scene.orbit(dx, dy) }\n        fun zoomCamera(delta: Float) { scene.zoom(delta) }
+        fun restart() { gameTime = 0f; state = State.LOADING }
+        fun orbitCamera(dx: Float, dy: Float) { scene.orbit(dx, dy) }
+        fun zoomCamera(delta: Float) { scene.zoom(delta) }
 
         override fun onSurfaceCreated(gl: javax.microedition.khronos.opengles.GL10?, cfg: javax.microedition.khronos.egl.EGLConfig?) {
             GLES20.glClearColor(.015f, .022f, .017f, 1f)
