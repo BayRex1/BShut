@@ -17,7 +17,7 @@ jobs:
       - name: Download Jeep GLB
         run: |
           mkdir -p app/src/main/assets/models
-          curl -L --fail --retry 3 "https://static.poly.pizza/b88ea7fb-e4d2-49fe-a372-448b36fc2a69.glb" -o app/src/main/assets/models/jeep.glb
+          curl -L --fail --retry 3 "https://raw.githubusercontent.com/VitorHolandaI/box_godot/9279b253b0d172f973cacf16fa1f7e3a6e393d57/assets/models/jeep_military/military_jeep.glb" -o app/src/main/assets/models/jeep.glb
           file app/src/main/assets/models/jeep.glb
           ls -lh app/src/main/assets/models/jeep.glb
       - name: Commit Jeep
