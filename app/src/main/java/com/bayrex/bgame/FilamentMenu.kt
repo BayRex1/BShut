@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.Choreographer
 import android.view.SurfaceView
+import com.google.android.filament.EntityManager
 import com.google.android.filament.LightManager
 import com.google.android.filament.utils.ModelViewer
 import com.google.android.filament.utils.Utils
@@ -57,7 +58,7 @@ class FilamentMenu(context: Context) {
 
     private fun configureLight() {
         val engine = viewer.engine
-        val lightEntity = engine.entityManager.create()
+        val lightEntity = EntityManager.get().create()
         LightManager.Builder(LightManager.Type.SUN)
             .color(1.0f, 0.95f, 0.82f)
             .intensity(80_000.0f)
@@ -77,8 +78,8 @@ class FilamentMenu(context: Context) {
                 buffer.put(bytes).flip()
                 surfaceView.post {
                     if (!started) return@post
-                    viewer.loadModelGltfAsync(buffer) { uri ->
-                        null
+                    viewer.loadModelGltfAsync(buffer) { _ ->
+                        ByteBuffer.allocateDirect(0)
                     }
                     viewer.transformToUnitCube()
                     viewer.view.dynamicResolutionOptions =
