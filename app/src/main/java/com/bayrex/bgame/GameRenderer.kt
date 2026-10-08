@@ -107,14 +107,17 @@ class GameRenderer(context: Context) {
 
         private fun cameraDrive(t: Float) {
             val k = smoothstep((t - 10f) / 7f)
-            val outside = floatArrayOf(4.5f, 2.75f, 6.8f)
-            val inside = floatArrayOf(.48f, 1.52f, -3.05f)
+            val jeepZ = -5.4f - t * .31f
+            // The interior camera follows the vehicle; the old fixed Z made it
+            // drift into the forest as the jeep drove forward.
+            val outside = floatArrayOf(4.5f, 2.75f, jeepZ + 11.8f)
+            val inside = floatArrayOf(-.48f, 1.42f, jeepZ + .28f)
             val eyeX = lerp(outside[0], inside[0], k)
             val eyeY = lerp(outside[1], inside[1], k)
             val eyeZ = lerp(outside[2], inside[2], k)
-            val lookX = lerp(0f, 0f, k)
-            val lookY = lerp(.95f, 1.35f, k)
-            val lookZ = lerp(-6.2f, -7.2f, k)
+            val lookX = lerp(0f, -.48f, k)
+            val lookY = lerp(.95f, 1.36f, k)
+            val lookZ = lerp(jeepZ - 6.2f, jeepZ - 7.0f, k)
             val shake = if (t > 28f) sin(t * 17f) * .018f else sin(t * 4.5f) * .006f
             Matrix.setLookAtM(view, 0, eyeX + shake, eyeY, eyeZ, lookX, lookY, lookZ, 0f, 1f, 0f)
         }
@@ -222,7 +225,8 @@ class GameRenderer(context: Context) {
             for (x in listOf(-.83f, .83f)) {
                 box(x, 1.48f, z - .28f, .075f, .72f, .08f, .025f, .03f, .032f)
             }
-            box(0f, 1.50f, z - .27f, 1.55f, .58f, .045f, .045f, .10f, .12f)
+            // Do not draw an opaque windshield: the first-person camera looks through
+            // this area. The pillars remain, giving a clear cabin frame.
             // grille / bumper / lights
             box(0f, .74f, z - 2.0f, 1.82f, .20f, .12f, .035f, .04f, .038f)
             box(0f, .79f, z - 2.08f, 1.45f, .15f, .10f, .08f, .085f, .075f)
