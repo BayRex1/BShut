@@ -7,7 +7,7 @@ import kotlin.math.min
 
 class HudView(context: android.content.Context, private val game: GameRenderer) : View(context) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var pulse = 0f
+    private var pulse = 0f\n    private var lastX = 0f\n    private var lastY = 0f\n    private var lastPinch = 0f
 
     init { setLayerType(View.LAYER_TYPE_SOFTWARE, null) }
 
@@ -59,37 +59,69 @@ class HudView(context: android.content.Context, private val game: GameRenderer) 
     }
 
     private fun drawDrive(c:Canvas,w:Float,h:Float) {
-        paint.color=Color.argb(210,0,0,0); paint.textAlign=Paint.Align.CENTER
-        paint.textSize=min(w,h)*0.024f
-        val t=game.gameTime
-        val line=when {
-            t<8f -> "Водитель: Дорога должна быть здесь…"
-            t<16f -> "Напарница: Красивый лес. Только не отвлекайся."
-            t<24f -> "Водитель: Спокойно, я всё контролирую."
-            else -> "Напарница: Смотри вперёд!"
-        }
-        val boxW=w*.58f; val boxH=h*.105f
-        paint.color=Color.argb(175,0,0,0); c.drawRoundRect((w-boxW)/2,h*.78f,(w+boxW)/2,h*.78f+boxH,18f,18f,paint)
-        paint.color=Color.WHITE; c.drawText(line,w/2,h*.78f+boxH*.61f,paint)
-        paint.textAlign=Paint.Align.LEFT; paint.textSize=min(w,h)*.018f; paint.alpha=160
-        c.drawText("ДЕНЬ • ЛЕСНОЙ МАРШРУТ",w*.04f,h*.08f,paint)
+        paint.color=Color.argb(210,0,0,0)
+        paint.textAlign=Paint.Align.CENTER
+        paint.textSize=min(w,h)*0.025f
+        paint.color=Color.WHITE
+        c.drawText("БЕСКОНЕЧНЫЙ БЕГ",w/2,h*.075f,paint)
+        paint.textSize=min(w,h)*0.018f
+        paint.alpha=170
+        c.drawText("Проведи пальцем — вращение камеры • два пальца — приближение",w/2,h*.115f,paint)
+        paint.alpha=255
+        paint.textAlign=Paint.Align.LEFT
+        paint.textSize=min(w,h)*.018f
+        paint.alpha=155
+        c.drawText("3RD PERSON • FOREST RUN",w*.04f,h*.94f,paint)
         paint.alpha=255
     }
-
-    private fun drawCrash(c:Canvas,w:Float,h:Float) {
-        paint.color=Color.BLACK; c.drawRect(0f,0f,w,h,paint)
-        paint.color=Color.WHITE; paint.textAlign=Paint.Align.CENTER
-        paint.typeface=Typeface.create("sans",Typeface.BOLD); paint.textSize=min(w,h)*.05f
-        if(game.gameTime<4f) c.drawText("…",w/2,h/2,paint)
-        else { paint.textSize=min(w,h)*.03f; paint.typeface=Typeface.DEFAULT; c.drawText("СВЯЗЬ ПОТЕРЯНА",w/2,h/2,paint) }
-    }
-
     override fun onTouchEvent(e:MotionEvent):Boolean {
-        if(e.action==MotionEvent.ACTION_UP && game.state==GameRenderer.State.MENU) {
-            val w=width.toFloat(); val h=height.toFloat(); val bw=w*.27f; val bh=h*.14f
-            val x=w-bw-w*.055f; val y=h-bh-w*.055f
-            if(e.x in x..x+bw && e.y in y..y+bh) { game.start(); return true }
+        if (game.state==GameRenderer.State.MENU) {
+            if(e.action==MotionEvent.ACTION_UP) {
+                val w=width.toFloat(); val h=height.toFloat(); val bw=w*.27f; val bh=h*.14f
+                val x=w-bw-w*.055f; val y=h-bh-w*.055f
+                if(e.x in x..x+bw && e.y in y..y+bh) { game.start(); return true }
+            }
+            return true
+        }
+        if (game.state==GameRenderer.State.DRIVE) {
+            when(e.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    lastX=e.x; lastY=e.y; lastPinch=0f
+                    return true
+                }
+                MotionEvent.ACTION_POINTER_DOWN -> {
+                    if(e.pointerCount>=2) lastPinch=pinchDistance(e)
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if(e.pointerCount>=2) {
+                        val d=pinchDistance(e)
+                        if(lastPinch>0f) game.zoomCamera((lastPinch-d)*0.012f)
+                        lastPinch=d
+                    } else {
+                        val dx=e.x-lastX; val dy=e.y-lastY
+                        game.orbitCamera(dx,dy)
+                        lastX=e.x; lastY=e.y
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_POINTER_UP -> {
+                    lastPinch=0f
+                    return true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    lastPinch=0f
+                    return true
+                }
+            }
         }
         return true
+    }
+
+    private fun pinchDistance(e:MotionEvent):Float {
+        if(e.pointerCount<2) return 0f
+        val dx=e.getX(0)-e.getX(1)
+        val dy=e.getY(0)-e.getY(1)
+        return kotlin.math.sqrt(dx*dx+dy*dy)
     }
 }
