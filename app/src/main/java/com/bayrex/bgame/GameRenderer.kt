@@ -63,7 +63,7 @@ class GameRenderer(context: Context) {
         private lateinit var capsule: Mesh
         private lateinit var shader: Shader
         private lateinit var treeGlb: StaticGlbModel
-        private lateinit var runningGlb: RunningGlbModel
+        private var runningGlb: RunningGlbModel? = null
         private val proj = FloatArray(16)
         private val view = FloatArray(16)
         private val model = FloatArray(16)
@@ -79,7 +79,7 @@ class GameRenderer(context: Context) {
             rounded = Mesh.sphere(20, 14)
             capsule = Mesh.capsule(16, 8)
             treeGlb = StaticGlbModel(context.assets, "models/tree.glb", scale = 0.01f)
-            runningGlb = RunningGlbModel(context.assets, "models/running.glb", scale = 0.01f)
+            runningGlb = try { RunningGlbModel(context.assets, "models/running.glb", scale = 0.01f) } catch (_: Exception) { null }
         }
 
         fun resize(w: Int, h: Int) {
@@ -102,7 +102,7 @@ class GameRenderer(context: Context) {
             } else {
                 cameraRunner(t)
                 drawForest(t)
-                runningGlb.draw(vp, 0f, 0f, runnerZ(t), t, yaw = 180f, instanceScale = 1f)
+                runningGlb?.draw(vp, 0f, 0f, runnerZ(t), t, yaw = 180f, instanceScale = 1f)
             }
         }
 
