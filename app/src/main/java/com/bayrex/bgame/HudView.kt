@@ -23,7 +23,7 @@ class HudView(context: android.content.Context, private val game: GameRenderer) 
             GameRenderer.State.MENU -> drawMenu(c,w,h)
             GameRenderer.State.LOADING -> drawLoading(c,w,h)
             GameRenderer.State.DRIVE -> drawDrive(c,w,h)
-            GameRenderer.State.CRASH -> drawCrash(c,w,h)
+            GameRenderer.State.CRASH -> drawDrive(c,w,h)
         }
         postInvalidateDelayed(33)
     }
